@@ -1,0 +1,56 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.5.7'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+tasks.named('compileJava') {
+	//useJUnitPlatform()
+	//options.compilerArgs << '-parameters'
+}
+
+group = 'com'
+version = '0.0.1-SNAPSHOT'
+description = 'Demo project for Spring Boot'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+	options.compilerArgs.add('-parameters')
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml'
+	
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	
+	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+	
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	
+	 // JWT (JSON Web Token) - 필수 의존성
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'      // JWT API 인터페이스
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'      // JWT 구현체 (메이븐 빌드 시 필요)
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'	// JWT JSON 파싱용 (Jackson 기반)
+    
+    // Spring Security (선택 사항이지만 JWT와 함께 사용하는 것을 강력히 권장)
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+}
+
+
