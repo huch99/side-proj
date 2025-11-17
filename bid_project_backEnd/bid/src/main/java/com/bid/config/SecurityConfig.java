@@ -54,7 +54,7 @@ public class SecurityConfig {
 						.requestMatchers(HttpMethod.GET, "/api/tenders").permitAll()
 						.requestMatchers(HttpMethod.GET, "/api/tenders/search").permitAll()
 						.requestMatchers(HttpMethod.GET, "/api/tenders/{cltrMnmtNo}").permitAll()
-						.requestMatchers("/api/login/**", "/api/signup/**").permitAll()
+						.requestMatchers("/api/login/**", "/api/signup/**", "/api/faq/**", "/api/mypage/**").permitAll()
 						.requestMatchers("/api/favorites/**").authenticated().requestMatchers("/api/**").authenticated()
 						.anyRequest().authenticated())
 				.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

@@ -114,7 +114,7 @@ public class TenderService {
             String cltrNm, String dpslMtdCd, String sido, String sgk, String emd,
             String goodsPriceFrom, String goodsPriceTo, String openPriceFrom, String openPriceTo,
             String pbctBegnDtmStr, String pbctClsDtmStr, // ✅ String으로 받아서 파싱
-            int pageNo, int numOfRows) {
+            int pageNo, int numOfRows, int status) {
 
         long startTime = System.currentTimeMillis();
 

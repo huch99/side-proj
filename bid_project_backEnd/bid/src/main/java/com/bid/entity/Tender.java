@@ -27,7 +27,8 @@ public class Tender {
 
     private Long tenderId;       // 입찰 고유 ID (PLNM_NO)
     private Long pbctNo;         // 공매번호 (PBCT_NO)
-    private String cltrHstrNo; 	// CLTR_HSTR_NO
+    private String cltrHstrNo;	// CLTR_HSTR_NO
+    @Column(columnDefinition = "TEXT")
     private String tenderTitle;  // 입찰 공고 제목 (CLTR_NM)
     private String organization; // 처분방식명 (DPSL_MTD_NM)
     private String bidNumber;    // 입찰 공고 번호 (BID_MNMT_NO)

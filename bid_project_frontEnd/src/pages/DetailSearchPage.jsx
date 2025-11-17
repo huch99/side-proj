@@ -176,9 +176,9 @@ const StatusTag = styled.span`
   font-weight: bold;
   color: white;
   background-color: ${(props) => {
-    if (props.$status === '입찰 진행중') return '#28a745';
-    if (props.$status === '입찰 예정') return '#ffc107';
-    if (props.$status === '입찰 마감') return '#dc3545';
+    if (props.$status === 1) return '#28a745';
+    if (props.$status === 2) return '#ffc107';
+    if (props.$status === 3) return '#dc3545';
     return '#6c757d';
   }};
 `;
@@ -264,7 +264,7 @@ const DetailSearchPage = () => {
   const [maxAppraisalPrice, setMaxAppraisalPrice] = useState('');
   const [pbctBegnDtm, setPbctBegnDtm] = useState('');
   const [pbctClsDtm, setPbctClsDtm] = useState('');
-  const [currentBidStatus, setCurrentBidStatus] = useState('');
+  const [currentStatus, setCurrentStatus] = useState("1");
 
   // totalPages 계산 (Redux state를 기반으로)
   const totalPages = Math.ceil(totalCount / numOfRows);
@@ -284,10 +284,9 @@ const DetailSearchPage = () => {
 
     if (currentSearchParams.minAppraisalPrice) params.append('goodsPriceFrom', currentSearchParams.minAppraisalPrice);
     if (currentSearchParams.maxAppraisalPrice) params.append('goodsPriceTo', currentSearchParams.maxAppraisalPrice);
-
-    if (currentSearchParams.pbctBegnDtm) params.append('pbctBegnDtm', pbctBegnDtm);
-    if (currentSearchParams.pbctClsDtm) params.append('pbctClsDtm', pbctClsDtm);
-    if (currentSearchParams.currentBidStatus) params.append('currentBidStatus', currentSearchParams.currentBidStatus);
+if (currentSearchParams.pbctBegnDtm) params.append('pbctBegnDtm', currentSearchParams.pbctBegnDtm); // ✅ 수정
+    if (currentSearchParams.pbctClsDtm) params.append('pbctClsDtm', currentSearchParams.pbctClsDtm);   // ✅ 수정
+    if (currentSearchParams.currentStatus) params.append('currentStatus', currentSearchParams.currentStatus);
 
     params.append('pageNo', page.toString());
     params.append('numOfRows', currentNumOfRows.toString());
@@ -305,7 +304,7 @@ const DetailSearchPage = () => {
       goodsPriceTo: currentSearchParams.maxAppraisalPrice,
       pbctBegnDtm: currentSearchParams.pbctBegnDtm,
       pbctClsDtm: currentSearchParams.pbctClsDtm,
-      currentBidStatus: currentSearchParams.currentBidStatus,
+      currentStatus: currentSearchParams.currentStatus,
       pageNo: page.toString(),
       numOfRows: currentNumOfRows.toString(),
     }));
@@ -326,7 +325,7 @@ const DetailSearchPage = () => {
     setMaxAppraisalPrice(currentParams.get('goodsPriceTo') || '');
     setPbctBegnDtm(currentParams.get('pbctBegnDtm') || '');
     setPbctClsDtm(currentParams.get('pbctClsDtm') || '');
-    setCurrentBidStatus(currentParams.get('currentBidStatus') || '');
+    setCurrentStatus(currentParams.get('currentStatus') || '');
 
     const urlPage = parseInt(currentParams.get('pageNo') || '1', 10);
     const urlNumOfRows = parseInt(currentParams.get('numOfRows') || '10', 10);
@@ -351,7 +350,7 @@ const DetailSearchPage = () => {
       maxAppraisalPrice: currentParams.get('goodsPriceTo') || '',
       pbctBegnDtm: currentParams.get('pbctBegnDtm') || '',
       pbctClsDtm: currentParams.get('pbctClsDtm') || '',
-      currentBidStatus: currentParams.get('currentBidStatus') || '',
+      currentStatus: currentParams.get('currentStatus') || '',
     };
 
     if (urlPage !== currentPage || urlNumOfRows !== numOfRows || (location.search && currentParams.toString() !== location.search.substring(1))) {
@@ -369,48 +368,49 @@ const DetailSearchPage = () => {
     const currentSearchParams = {
       cltrNm, dpslMtdCd, sido, sgk, emd,
       minAppraisalPrice, maxAppraisalPrice,
-      pbctBegnDtm, pbctClsDtm, currentBidStatus,
+      pbctBegnDtm, pbctClsDtm, currentStatus,
     };
 
+    console.log(currentSearchParams);
     executeSearch(1, numOfRows, currentSearchParams);
 
   }, [cltrNm, dpslMtdCd, sido, sgk, emd, minAppraisalPrice, maxAppraisalPrice,
-    pbctBegnDtm, pbctClsDtm, numOfRows, currentBidStatus, dispatch, executeSearch]);
+    pbctBegnDtm, pbctClsDtm, numOfRows, currentStatus, dispatch, executeSearch]);
 
   // 결과 표기 개수
   const handleItemsPerPageChange = useCallback((e) => {
     const newNumOfRows = Number(e.target.value);
 
-    dispatch(setNumOfRowsRedux(newNumOfRows));
+    // dispatch(setNumOfRowsRedux(newNumOfRows));
 
     const currentSearchParams = {
       cltrNm, dpslMtdCd, sido, sgk, emd,
       minAppraisalPrice, maxAppraisalPrice,
       pbctBegnDtm, pbctClsDtm,
-      currentBidStatus,
+      currentStatus,
     };
 
     executeSearch(1, newNumOfRows, currentSearchParams);
 
   }, [cltrNm, dpslMtdCd, sido, sgk, emd, minAppraisalPrice, maxAppraisalPrice,
-    pbctBegnDtm, pbctClsDtm, currentBidStatus, dispatch, executeSearch]);
+    pbctBegnDtm, pbctClsDtm, currentStatus, executeSearch]);
 
   // 페이징 기능
   const handlePageChange = useCallback((page) => {
     if (page < 1 || page > totalPages) return;
-    dispatch(setCurrentPageRedux(page));
+    // dispatch(setCurrentPageRedux(page));
 
     const currentSearchParams = {
       cltrNm, dpslMtdCd, sido, sgk, emd,
       minAppraisalPrice, maxAppraisalPrice,
       pbctBegnDtm, pbctClsDtm,
-      currentBidStatus,
+      currentStatus,
     };
 
     executeSearch(page, numOfRows, currentSearchParams);
 
   }, [cltrNm, dpslMtdCd, sido, sgk, emd, minAppraisalPrice, maxAppraisalPrice,
-    pbctBegnDtm, pbctClsDtm, currentBidStatus, dispatch, executeSearch, totalPages, numOfRows]);
+    pbctBegnDtm, pbctClsDtm, currentStatus, executeSearch, totalPages, numOfRows]);
 
 
   // ✅ 즐겨찾기 토글 핸들러
@@ -436,7 +436,7 @@ const DetailSearchPage = () => {
               <h3>{item.tenderTitle}</h3>
 
               {/* ✅ 상태 태그 표시 */}
-            {item.status && <StatusTag $status={item.status}>{item.status}</StatusTag>}
+            {item.status && <StatusTag $status={item.status}>{item.status === 1 ? "입찰 진행 중" : item.status ===2 ? "입찰 예정" : "입찰 마감"}</StatusTag>}
 
               <p><strong>처분방식:</strong> {item.organization}</p>
               <p><strong>공고번호:</strong> {item.pbctNo}</p>
@@ -505,8 +505,8 @@ const DetailSearchPage = () => {
             onChange={(e) => setDpslMtdCd(e.target.value)}
           >
             <option value="">전체</option>
-            <option value="경쟁입찰">경쟁입찰</option>
-            <option value="수의계약">수의계약</option>
+            <option value="매각">매각</option>
+            <option value="임대(대부)">임대</option>
           </Select>
         </FormGroup>
 
@@ -563,16 +563,16 @@ const DetailSearchPage = () => {
         </FormGroup>
 
         <FormGroup>
-            <Label htmlFor="currentBidStatus">입찰 상태</Label>
+            <Label htmlFor="currentStatus">입찰 상태</Label>
             <Select
-                id="currentBidStatus"
-                name="currentBidStatus"
-                value={currentBidStatus}
-                onChange={(e) => setCurrentBidStatus(e.target.value)}
+                id="currentStatus"
+                name="currentStatus"
+                value={currentStatus}
+                onChange={(e) => setCurrentStatus(e.target.value)}
             >
-                <option value="입찰 진행중">입찰 진행중</option>
-                <option value="입찰 예정">입찰 예정</option>
-                <option value="입찰 마감">입찰 마감</option>
+                <option value="1">입찰 진행 중</option>
+                <option value="2">입찰 예정</option>
+                <option value="3">입찰 마감</option>
             </Select>
         </FormGroup>
 

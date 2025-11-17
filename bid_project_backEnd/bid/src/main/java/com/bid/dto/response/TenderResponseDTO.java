@@ -40,23 +40,29 @@ public class TenderResponseDTO {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss") // LocalDateTime 직렬화 형식 지정
 	private LocalDateTime deadline; // 입찰 마감일
 	
-	private String status;
+	private int status;
+	
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	private LocalDateTime pbctBegnDtm;
+	
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	private LocalDateTime pbctClsDtm;
 
 	// 엔티티를 DTO로 변환하는 정적 팩토리 메서드 (간단한 매퍼 역할)
 	public static TenderResponseDTO fromEntity(Tender tender) {
 		
 		LocalDateTime now = LocalDateTime.now();
 		
-		String status;
+		int status;
 		
 		if(tender.getAnnouncementDate() == null || tender.getDeadline() == null) {
-			status = "알 수 없음";
+			status = 0;
 		} else if (now.isBefore(tender.getAnnouncementDate())) {
-			status = "입찰 예정";
+			status = 2;
 		} else if (now.isAfter(tender.getDeadline())) {
-			status = "입찰 마감";
+			status = 3;
 		} else {
-			status = "입찰 진행 중";
+			status = 1;
 		}
 		return TenderResponseDTO.builder().tenderId(tender.getTenderId()).pbctNo(tender.getPbctNo())
 				.cltrHstrNo(tender.getCltrHstrNo()).cltrMnmtNo(tender.getCltrMnmtNo())
@@ -66,6 +72,7 @@ public class TenderResponseDTO {
 				.openPriceFrom(tender.getInitialOpenPriceFrom())
 				.openPriceTo(tender.getInitialOpenPriceTo())
 				.lastSyncedAt(tender.getLastSyncedAt())
+				.minBidPrice(tender.getMinBidPrice() != null ? tender.getMinBidPrice() : 0L)
                 .active(tender.isActive())
                 .status(status)
 				.build();

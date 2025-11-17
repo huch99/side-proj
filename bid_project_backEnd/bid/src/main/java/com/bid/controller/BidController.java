@@ -26,7 +26,7 @@ public class BidController {
 	@PostMapping
 	public ResponseEntity<BidResponseDTO> placeBid(@Valid @RequestBody BidRequestDTO bidRequestDTO) {
 		try {
-			log.info("입찰 요청 수신 : tenderId={}, bidPrice={}", bidRequestDTO.getTenderId(),bidRequestDTO.getBidPrice());
+			log.info("입찰 요청 수신 : tenderId={}, bidPrice={}", bidRequestDTO.getCltrMnmtNo(),bidRequestDTO.getBidPrice());
 			
 			BidResponseDTO response = bidService.placeBid(bidRequestDTO);
 			return ResponseEntity.status(HttpStatus.CREATED).body(response);

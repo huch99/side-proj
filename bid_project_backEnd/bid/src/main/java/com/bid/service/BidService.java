@@ -1,6 +1,8 @@
 package com.bid.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,7 +33,7 @@ public class BidService {
 	public BidResponseDTO placeBid(BidRequestDTO bidRequestDTO) {
 		Long currentUserId = getCurrentUserId();
 		
-		Tender tender = tenderRepository.findById(bidRequestDTO.getTenderId())
+		Tender tender = tenderRepository.findByCltrMnmtNo(bidRequestDTO.getCltrMnmtNo())
 				.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 입찰 공고입니다."));
 		
 		User user = userRepository.findById(currentUserId)
@@ -96,4 +98,40 @@ public class BidService {
 		
 		return ((CustomUserDetails) authentication.getPrincipal()).getUserId()
 ;	}
+	
+	public List<BidResponseDTO> getMyBids(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("인증된 사용자 정보를 찾을 수 없습니다."));
+
+        List<Bid> bids = bidRepository.findByUser(user);
+
+        return bids.stream()
+                .map(bid -> {
+                    Tender tender = bid.getTender(); // Bid 엔티티에서 Tender 엔티티에 접근
+
+                    String calculatedTenderStatus = "알 수 없음"; // 기본값
+                    if(tender.getAnnouncementDate() != null && tender.getDeadline() != null) {
+                        LocalDateTime now = LocalDateTime.now();
+                        if (now.isBefore(tender.getAnnouncementDate())) {
+                            calculatedTenderStatus = "입찰 예정";
+                        } else if (now.isAfter(tender.getDeadline())) {
+                            calculatedTenderStatus = "입찰 마감";
+                        } else {
+                            calculatedTenderStatus = "입찰 진행중";
+                        }
+                    }
+
+                    return BidResponseDTO.builder()
+                            .bidId(bid.getBidId())
+                            .tenderId(tender.getTenderId())
+                            .userId(bid.getUser().getUserId())
+                            .bidPrice(bid.getBidPrice())
+                            .bidTime(bid.getBidTime())
+                            .tenderTitle(tender.getTenderTitle())
+                            .cltrMnmtNo(tender.getCltrMnmtNo())
+                            .tenderStatus(calculatedTenderStatus)
+                            .build();
+                })
+                .collect(Collectors.toList());
+    }
 }

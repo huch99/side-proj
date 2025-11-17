@@ -1,5 +1,7 @@
 package com.bid.controller;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,7 +13,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bid.dto.request.UserEditRequestDTO;
+import com.bid.dto.response.BidResponseDTO;
 import com.bid.dto.response.UserProfileResponseDTO;
+import com.bid.security.CustomUserDetails;
+import com.bid.service.BidService;
 import com.bid.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -25,9 +30,11 @@ import lombok.extern.slf4j.Slf4j;
 public class UserController {
 
 	private final UserService userService;
+	
+	private final BidService bidService;
 
 	// 현재 로그인한 사용자의 프로필 정보 조회
-	@GetMapping//("/profile")
+	@GetMapping
 	public ResponseEntity<UserProfileResponseDTO> getUserProfile(@AuthenticationPrincipal UserDetails userDetails) {
 		log.info("Accessing user profile for username: {}", userDetails.getUsername());
 		try {
@@ -68,6 +75,31 @@ public class UserController {
         } catch (Exception e) {
             log.error("Error changing password for {}: {}", userDetails.getUsername(), e.getMessage());
             return ResponseEntity.status(500).body("비밀번호 변경 중 오류가 발생했습니다.");
+        }
+    }
+    
+    @GetMapping("/bids")
+    public ResponseEntity<List<BidResponseDTO>> getMyBids(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        // ✅ CustomUserDetails 객체에서 바로 getUserId() 메서드를 호출합니다!
+        // 이 userId는 로그인된 사용자의 고유 ID입니다.
+        if (userDetails == null) {
+            log.warn("인증되지 않은 사용자의 마이페이지 입찰 내역 조회 시도.");
+            return ResponseEntity.status(401).build(); // 401 Unauthorized
+        }
+
+        Long userId = userDetails.getUserId(); // ✅ 여기 한 줄로 사용자 ID를 가져옵니다.
+        log.info("사용자 {}의 마이페이지 입찰 내역 조회 요청.", userId);
+
+        try {
+            List<BidResponseDTO> myBids = bidService.getMyBids(userId);
+            log.info("사용자 {}의 입찰 내역 {}개 조회 완료.", userId, myBids.size());
+            return ResponseEntity.ok(myBids);
+        } catch (IllegalArgumentException e) {
+            log.warn("사용자 {}의 입찰 내역 조회 중 오류 발생: {}", userId, e.getMessage());
+            return ResponseEntity.badRequest().body(null);
+        } catch (Exception e) {
+            log.error("사용자 {}의 입찰 내역 조회 중 서버 오류 발생: {}", userId, e.getMessage(), e);
+            return ResponseEntity.status(500).build();
         }
     }
 }

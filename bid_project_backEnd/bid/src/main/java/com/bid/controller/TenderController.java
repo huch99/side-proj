@@ -43,7 +43,7 @@ public class TenderController {
     }
     
     @GetMapping("/{cltrMnmtNo}")
-    public ResponseEntity<TenderResponseDTO> getTenderByTenderId(@PathVariable("cltrMnmtNo") String cltrMnmtNo) {
+    public ResponseEntity<TenderResponseDTO> getTenderDetail(@PathVariable("cltrMnmtNo") String cltrMnmtNo) {
     	 log.info("✅ Controller: getTenderDetail 요청 시작, CLTR_MNMT_NO: {}", cltrMnmtNo);
          try {
              // 서비스 메서드 호출
@@ -73,7 +73,9 @@ public class TenderController {
             @RequestParam(name = "pbctBegnDtm", required = false) String pbctBegnDtm,   // String으로 받아서 서비스에서 파싱
             @RequestParam(name = "pbctClsDtm", required = false) String pbctClsDtm,    // String으로 받아서 서비스에서 파싱
             @RequestParam(name = "pageNo", defaultValue = "1") int pageNo,
-            @RequestParam(name = "numOfRows", defaultValue = "10") int numOfRows) {
+            @RequestParam(name = "numOfRows", defaultValue = "10") int numOfRows,
+            @RequestParam(name = "status", defaultValue = "1") int status
+    		) {
 
         log.info("Request for search tenders with cltrNm: {}, dpslMtdCd: {}, pageNo: {}, numOfRows: {}",
                 cltrNm, dpslMtdNm, pageNo, numOfRows);
@@ -82,7 +84,7 @@ public class TenderController {
                     cltrNm, dpslMtdNm, sido, sgk, emd,
                     goodsPriceFrom, goodsPriceTo, openPriceFrom, openPriceTo,
                     pbctBegnDtm, pbctClsDtm,
-                    pageNo, numOfRows
+                    pageNo, numOfRows, status
             );
             log.info("Successfully fetched search tenders. Total count: {}", tenders.getTotalCount());
             return ResponseEntity.ok(tenders);
@@ -91,4 +93,5 @@ public class TenderController {
             return ResponseEntity.status(500).build();
         }
     }
+    
 }

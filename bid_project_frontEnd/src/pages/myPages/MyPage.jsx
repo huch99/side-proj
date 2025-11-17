@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { updateProfileSuccess } from '../../features/login_signup/loginSlice';
 import EmailEditModal from '../../components/modal/EmailEditModal';
@@ -8,6 +8,7 @@ import PasswordChangeModal from '../../components/modal/PasswordChangeModal';
 import { fetchFavoriteTenderIds, toggleFavorite } from '../../features/tenders/tenderSlicce';
 import axios from 'axios';
 import { FaStar } from 'react-icons/fa';
+import { fetchMyBids, resetMyBidsStatus } from '../../features/bids/myBidsSlice';
 
 const MyPageContainer = styled.div`
   max-width: 800px;
@@ -179,6 +180,46 @@ const FavoriteIcon = styled.div`
   }
 `;
 
+// ✅ 내 입찰 내역 관련 Styled Components
+const MyBidsList = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+`;
+
+const MyBidItem = styled(Link)` /* 클릭 시 상세페이지로 이동하도록 Link 컴포넌트 사용 */
+  background-color: #f0fdf4; /* 연한 녹색 배경 */
+  border: 1px solid #d4edda; /* 녹색 테두리 */
+  border-radius: 10px;
+  padding: 20px;
+  text-decoration: none; /* Link 기본 스타일 제거 */
+  color: #333;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease-in-out;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  h4 {
+    font-size: 1.2rem;
+    color: #28a745; /* 녹색 타이틀 */
+    margin-bottom: 10px;
+    line-height: 1.4;
+  }
+  p {
+    font-size: 0.95rem;
+    color: #555;
+    margin-bottom: 5px;
+  }
+  span {
+    font-weight: bold;
+    color: #343a40;
+  }
+`;
+
 const MyPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -201,6 +242,8 @@ const MyPage = () => {
   const [favoriteTendersDetail, setFavoriteTendersDetail] = useState([]); // ✅ 즐겨찾기 상세 정보를 저장할 상태
   const [loadingFavoriteDetails, setLoadingFavoriteDetails] = useState(false); // ✅ 즐겨찾기 상세 정보 로딩
   const [errorFavoriteDetails, setErrorFavoriteDetails] = useState(null);
+
+   const { items: myBids, status: myBidsStatus, error: myBidsError } = useSelector((state) => state.myBids);
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -262,6 +305,16 @@ const MyPage = () => {
       setFavoriteTendersDetail([]); // 로그아웃 상태면 목록 비움
     }
   }, [isLoggedIn, favoriteTenderIds, isFavoriteLoading]);
+
+  useEffect(() => {
+    if (isLoggedIn && userId) { // 로그인 상태이고 userId가 있을 때만
+      dispatch(fetchMyBids()); 
+    }
+    return () => {
+      // 컴포넌트 언마운트 또는 isLoggedIn/userId 변경 시 상태 초기화
+      dispatch(resetMyBidsStatus()); 
+    };
+  }, [dispatch, isLoggedIn, userId]);
 
   // ✅ 즐겨찾기 해제 핸들러
   const handleRemoveFavorite = useCallback((e, cltrMnmtNo) => {
@@ -330,6 +383,30 @@ const MyPage = () => {
           onClose={() => setShowPasswordModal(false)}
         />
       )}
+
+       {/* ✅ 2. 내 입찰 내역 (새로 추가) */}
+      <Section>
+        <SectionTitle>내 입찰 내역</SectionTitle>
+        {myBidsStatus === 'loading' && <p style={{textAlign: 'center', color: '#666'}}>입찰 내역 로딩 중...</p>}
+        {myBidsStatus === 'failed' && <p style={{textAlign: 'center', color: 'red'}}>에러: {myBidsError}</p>}
+        {myBidsStatus === 'succeeded' && myBids.length === 0 ? (
+          <p style={{ textAlign: 'center', color: '#666' }}>아직 참여한 입찰이 없습니다. 마음에 드는 입찰에 참여해보세요!</p>
+        ) : (
+          <MyBidsList>
+            {myBidsStatus === 'succeeded' && myBids.map((bid) => (
+              <MyBidItem key={bid.bidId} to={`/tenders/${bid.cltrMnmtNo}`}> {/* ✅ 상세 페이지 링크 */}
+                <h4>
+                  {bid.tenderTitle || '제목 없음'}
+                  {bid.tenderStatus && <StatusTag $status={bid.tenderStatus}>{bid.tenderStatus}</StatusTag>}
+                </h4>
+                <p>입찰 금액: <span>{bid.bidPrice ? bid.bidPrice.toLocaleString() + '원' : 'N/A'}</span></p>
+                <p>입찰 일시: <span>{bid.bidTime ? new Date(bid.bidTime).toLocaleString() : 'N/A'}</span></p>
+                {/* 다른 필요한 정보 표시 */}
+              </MyBidItem>
+            ))}
+          </MyBidsList>
+        )}
+      </Section>
 
       {/* 4. 관심 입찰 목록 (TODO: 백엔드 및 프론트엔드 추가 구현 필요) */}
       <Section>

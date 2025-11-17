@@ -13,14 +13,16 @@ import lombok.Setter;
 public class BidRequestDTO {
 
 	@NotNull(message = "입찰할 공고 ID는 필수입니다.")
-	private Long tenderId;
+	private String cltrMnmtNo;
+	
+	private Long useId;
 	
 	@Min(value = 1, message = "입찰 가격은 1원 이상이어야 합니다.")
 	private Long bidPrice;
 	
 	@Builder
 	public BidRequestDTO(Long tenderId, Long bidPrice) {
-		this.tenderId = tenderId;
+		this.cltrMnmtNo = cltrMnmtNo;
 		this.bidPrice = bidPrice;
 	}
 }
