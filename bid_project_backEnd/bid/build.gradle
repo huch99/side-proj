@@ -17,7 +17,6 @@ java {
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(21)
 	}
-	options.compilerArgs.add('-parameters')
 }
 
 configurations {
