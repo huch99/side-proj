@@ -397,7 +397,7 @@ const MyPage = () => {
               <MyBidItem key={bid.bidId} to={`/tenders/${bid.cltrMnmtNo}`}> {/* ✅ 상세 페이지 링크 */}
                 <h4>
                   {bid.tenderTitle || '제목 없음'}
-                  {bid.tenderStatus && <StatusTag $status={bid.tenderStatus}>{bid.tenderStatus}</StatusTag>}
+                  {/* {bid.tenderStatus && <StatusTag $status={bid.tenderStatus}>{bid.tenderStatus}</StatusTag>} */}
                 </h4>
                 <p>입찰 금액: <span>{bid.bidPrice ? bid.bidPrice.toLocaleString() + '원' : 'N/A'}</span></p>
                 <p>입찰 일시: <span>{bid.bidTime ? new Date(bid.bidTime).toLocaleString() : 'N/A'}</span></p>
