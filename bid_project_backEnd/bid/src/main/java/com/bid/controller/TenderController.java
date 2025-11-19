@@ -32,7 +32,6 @@ public class TenderController {
     public ResponseEntity<PagedTenderResponse> getAllTenders(
             @RequestParam(name ="pageNo", defaultValue = "1") int pageNo) {    // ✅ numOfRows 파라미터 추가 (기본값 10)
 		try {
-            // ✅ numOfRows는 고정값 10을 서비스로 전달
             PagedTenderResponse tenders = tenderService.getAllTenders(pageNo, 10);
             log.info("Successfully fetched all tenders. Total count: {}", tenders.getTotalCount());
             return ResponseEntity.ok(tenders);
@@ -59,7 +58,8 @@ public class TenderController {
          }
     }
     
-    @GetMapping("/search")
+//    상세검색
+    @GetMapping("/search") // 간결화 필요
     public ResponseEntity<PagedTenderResponse> searchTenders(
             @RequestParam(name = "cltrNm", required = false) String cltrNm,
             @RequestParam(name = "dpslMtdCd", required = false) String dpslMtdNm, // 엔티티 organization 필드와 매핑

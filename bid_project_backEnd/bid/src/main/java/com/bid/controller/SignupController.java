@@ -30,12 +30,9 @@ public class SignupController {
 	 @PostMapping
 	    public ResponseEntity<SignupResponseDTO> signupUser(@Valid @RequestBody SignupRequestDTO signupRequestDTO,
 	                                                         BindingResult bindingResult) {
-	        // @Valid 어노테이션으로 SignupRequestDTO에 대한 유효성 검사 수행
-	        // BindingResult를 통해 유효성 검사 결과를 받음
 
 	        // 1. 유효성 검사 실패 시 처리
 	        if (bindingResult.hasErrors()) {
-	            // 필드 에러 메시지를 조합하여 반환
 	            String errorMessage = bindingResult.getFieldErrors().stream()
 	                    .map(fieldError -> fieldError.getDefaultMessage())
 	                    .collect(java.util.stream.Collectors.joining(", "));
