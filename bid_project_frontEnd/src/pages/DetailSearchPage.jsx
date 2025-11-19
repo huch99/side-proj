@@ -510,7 +510,7 @@ if (currentSearchParams.pbctBegnDtm) params.append('pbctBegnDtm', currentSearchP
           </Select>
         </FormGroup>
 
-        <FormGroup>
+        {/* <FormGroup>
           <Label htmlFor="sido">물건소재지 (시/도)</Label>
           <Input
             id="sido"
@@ -541,7 +541,7 @@ if (currentSearchParams.pbctBegnDtm) params.append('pbctBegnDtm', currentSearchP
             onChange={(e) => setEmd(e.target.value)}
             placeholder="예: 역삼동"
           />
-        </FormGroup>
+        </FormGroup> */}
 
         <FormGroup style={{gridRow: 4}}>
           <Label>감정가 (원)</Label>

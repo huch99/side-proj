@@ -168,7 +168,7 @@ const HomePage = () => {
             <S_BidItemCard key={bid.cltrMnmtNo} to={`/tenders/${bid.cltrMnmtNo}`}>
               <S_BidTitle>{bid.tenderTitle}</S_BidTitle>
               <S_BidMeta>
-                <strong>공고 번호 : </strong> {bid.cltrMnmtNo}
+                <strong>물건 관리 번호 : </strong> {bid.cltrMnmtNo}
               </S_BidMeta>
               <S_BidMeta>
                 <strong>처분 방식 : </strong> {bid.organization}
